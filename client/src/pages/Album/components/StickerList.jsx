@@ -5,7 +5,11 @@ function StickerRow({ sticker, onAdd, onRemove }) {
   return (
     <div
       className={`mb-2 grid min-h-[68px] grid-cols-[72px_1fr_auto] items-center gap-2 rounded-lg border px-3 py-2 sm:grid-cols-[88px_1fr_132px] ${
-        isMissing ? 'border-slate-200 bg-white text-slate-400' : 'border-slate-200 bg-white text-slate-950 shadow-sm'
+        isDuplicate
+          ? 'border-amber-300 bg-amber-50 text-slate-950'
+          : isMissing
+          ? 'border-slate-200 bg-white text-slate-400'
+          : 'border-slate-200 bg-white text-slate-950 shadow-sm'
       }`}
     >
       <div>
@@ -20,8 +24,13 @@ function StickerRow({ sticker, onAdd, onRemove }) {
           {sticker.name || (sticker.type === 'troquelada' ? 'Troquelada' : '----------')}
         </p>
         {isDuplicate && (
-          <span className="mt-1 inline-flex rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
-            x{sticker.quantity}
+          <span className="mt-1 inline-flex items-center gap-1.5">
+            <span className="rounded bg-amber-200 px-2 py-0.5 text-xs font-bold text-amber-900">
+              Duplicada
+            </span>
+            <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
+              ×{sticker.quantity}
+            </span>
           </span>
         )}
       </div>
