@@ -12,71 +12,55 @@ function groupByType(list) {
   }, []);
 }
 
-function codeGrid(items) {
+function codeList(items, showQty = false) {
   return items.map((s) => {
-    const extra = s.quantity > 1 ? ` ×${s.quantity}` : '';
-    return `<span class="code">#${s.displayCode}${extra}</span>`;
+    const suffix = showQty && s.quantity > 1 ? `×${s.quantity}` : '';
+    return `<span class="c">${s.displayCode}${suffix ? `<sup>${suffix}</sup>` : ''}</span>`;
   }).join('');
 }
 
 function buildHTML(username, stats, stickers) {
-  const owned    = stickers.filter((s) => s.quantity >= 1);
-  const missing  = stickers.filter((s) => s.quantity === 0);
-  const dupes    = stickers.filter((s) => s.quantity > 1);
-  const date     = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+  const owned   = stickers.filter((s) => s.quantity >= 1);
+  const missing = stickers.filter((s) => s.quantity === 0);
+  const dupes   = stickers.filter((s) => s.quantity > 1);
+  const date    = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  function section(title, color, list) {
+  function block(label, list, showQty = false) {
     if (!list.length) return '';
-    const groups = groupByType(list);
-    const rows = groups.map(({ type, items }) => `
-      <div class="group">
-        <h3>${TYPE_LABEL[type]} (${items.length})</h3>
-        <div class="grid">${codeGrid(items)}</div>
+    return groupByType(list).map(({ type, items }) => `
+      <div class="b">
+        <div class="bh">${label} · ${TYPE_LABEL[type]} (${items.length})</div>
+        <div class="codes">${codeList(items, showQty)}</div>
       </div>`).join('');
-    return `<section><h2 style="color:${color}">${title} (${list.length})</h2>${rows}</section>`;
   }
 
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
-  <title>Reporte – 3 Reyes del Mundial 2026</title>
+  <title>${username} – 3 Reyes 2026</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 20px; }
-    header { border-bottom: 2px solid #111; padding-bottom: 8px; margin-bottom: 16px; }
-    header h1 { font-size: 16px; }
-    header p { font-size: 11px; color: #555; margin-top: 2px; }
-    .stats { display: flex; gap: 24px; margin-bottom: 20px; }
-    .stat { text-align: center; }
-    .stat .num { font-size: 22px; font-weight: bold; }
-    .stat .lbl { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .5px; }
-    section { margin-bottom: 20px; page-break-inside: avoid; }
-    section h2 { font-size: 13px; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
-    .group { margin-bottom: 10px; }
-    .group h3 { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: #777; margin-bottom: 4px; }
-    .grid { display: flex; flex-wrap: wrap; gap: 4px; }
-    .code { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-family: monospace; font-weight: bold; }
-    @media print { body { padding: 10px; } }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Courier New',monospace;font-size:8pt;color:#000;padding:12mm}
+    h1{font-size:10pt;font-weight:bold}
+    .meta{font-size:7pt;color:#555;margin-bottom:5px}
+    .stats{font-size:8pt;border-top:1px solid #000;border-bottom:1px solid #000;padding:3px 0;margin-bottom:8px}
+    .b{margin-bottom:7px}
+    .bh{font-size:7pt;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+    .codes{display:flex;flex-wrap:wrap;gap:2px}
+    .c{font-size:7.5pt;border:1px solid #bbb;padding:1px 3px;line-height:1.4}
+    sup{font-size:6pt}
+    @media print{body{padding:8mm}}
   </style>
 </head>
 <body>
-  <header>
-    <h1>3 Reyes del Mundial 2026</h1>
-    <p>Usuario: ${username} &nbsp;·&nbsp; ${date}</p>
-  </header>
-
-  <div class="stats">
-    <div class="stat"><div class="num">${stats.owned}<span style="font-size:14px;color:#555">/${stats.total}</span></div><div class="lbl">Tengo</div></div>
-    <div class="stat"><div class="num" style="color:#dc2626">${stats.missing}</div><div class="lbl">Me faltan</div></div>
-    <div class="stat"><div class="num" style="color:#d97706">${stats.duplicates}</div><div class="lbl">Duplicadas</div></div>
-  </div>
-
-  ${section('Figuritas que tengo', '#15803d', owned)}
-  ${section('Figuritas que me faltan', '#dc2626', missing)}
-  ${section('Figuritas duplicadas', '#d97706', dupes)}
-
-  <script>window.onload = () => { window.print(); }</script>
+  <h1>3 Reyes del Mundial 2026</h1>
+  <p class="meta">${username} · ${date}</p>
+  <p class="stats">Tengo ${stats.owned}/${stats.total} &nbsp;·&nbsp; Faltan ${stats.missing} &nbsp;·&nbsp; Duplicadas ${stats.duplicates}</p>
+  ${block('TENGO', owned)}
+  ${block('FALTA', missing)}
+  ${block('DUPLICADA', dupes, true)}
+  <script>window.onload=()=>window.print()</script>
 </body>
 </html>`;
 }

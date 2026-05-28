@@ -52,7 +52,7 @@ export default function FilterBar({ search, setSearch, status, setStatus, type, 
 
         <input
           className="h-10 w-full rounded-md border border-slate-300 px-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 sm:w-72"
-          placeholder="Buscar número..."
+          placeholder="N.º de figurita (ej: 023, T05, E12)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

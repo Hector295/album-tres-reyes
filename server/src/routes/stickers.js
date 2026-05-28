@@ -54,7 +54,7 @@ router.get('/', (req, res) => {
       FROM stickers s
       LEFT JOIN user_stickers us ON us.sticker_id = s.id AND us.user_id = @userId
       ${where}
-      ORDER BY CASE s.type WHEN 'normal' THEN 0 ELSE 1 END, s.number ASC
+      ORDER BY CASE s.type WHEN 'normal' THEN 0 WHEN 'troquelada' THEN 1 ELSE 2 END, s.number ASC
     `
     )
     .all(params);
@@ -81,6 +81,32 @@ router.get('/stats', (req, res) => {
     missing: TOTAL_STICKERS - (stats.owned || 0),
     duplicates: stats.duplicates || 0
   });
+});
+
+router.post('/bulk-add', (req, res) => {
+  const items = req.body.items;
+  if (!Array.isArray(items) || !items.length) {
+    return res.status(400).json({ message: 'Lista vacía' });
+  }
+
+  const notFound = [];
+  const results = [];
+
+  db.transaction(() => {
+    for (const item of items) {
+      const sticker = db.prepare('SELECT id FROM stickers WHERE number = ? AND type = ?').get(item.number, item.type);
+      if (!sticker) { notFound.push(item); continue; }
+
+      db.prepare(`
+        INSERT INTO user_stickers (user_id, sticker_id, quantity) VALUES (?, ?, 1)
+        ON CONFLICT(user_id, sticker_id) DO UPDATE SET quantity = quantity + 1
+      `).run(req.user.id, sticker.id);
+
+      results.push(getStickerForUser(req.user.id, sticker.id));
+    }
+  })();
+
+  return res.json({ processed: results.length, notFound, results });
 });
 
 router.post('/:id/add', (req, res) => {

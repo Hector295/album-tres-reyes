@@ -68,6 +68,12 @@ export default function Album() {
     return data;
   }
 
+  async function bulkAdd(items) {
+    const { data } = await api.post('/stickers/bulk-add', { items });
+    await refresh();
+    return data;
+  }
+
   async function addByNumber(number, selectedType) {
     const normalized = Number(number);
     const target = stickers.find(
@@ -125,7 +131,7 @@ export default function Album() {
 
       {view === 'album' ? (
         <>
-          <QuickAdd onAdd={addByNumber} />
+          <QuickAdd onAdd={addByNumber} onBulkAdd={bulkAdd} />
           <section className="mx-auto max-w-6xl px-4 py-4">
             <StatsBar stats={stats} />
             <FilterBar
