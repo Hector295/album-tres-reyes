@@ -105,11 +105,11 @@ export default function Album() {
           </button>
         </div>
 
-        <div className="mx-auto flex max-w-6xl gap-1 px-4 pb-0">
-          {[{ label: 'Mi álbum', value: 'album' }, { label: 'Intercambios', value: 'trades' }, { label: 'Perfil', value: 'profile' }, { label: 'Exportar', value: 'export' }].map((tab) => (
+        <div className="mx-auto flex max-w-6xl overflow-x-auto px-4 pb-0 scrollbar-none">
+          {[{ label: 'Mi álbum', value: 'album' }, { label: 'Intercambios', value: 'trades' }, { label: 'Perfil', value: 'profile' }, { label: 'Exportar PDF', value: 'export' }].map((tab) => (
             <button
               key={tab.value}
-              className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
+              className={`shrink-0 border-b-2 px-3 py-2 text-sm font-semibold whitespace-nowrap transition-colors ${
                 view === tab.value
                   ? 'border-emerald-600 text-emerald-700'
                   : 'border-transparent text-slate-500 hover:text-slate-700'
