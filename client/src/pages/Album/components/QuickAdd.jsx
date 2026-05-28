@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 const CONFIG = {
   normal:     { max: 584, maxLen: 3 },
   troquelada: { max: 48,  maxLen: 2 },
+  repechaje:  { max: 67,  maxLen: 2 },
 };
 
 export default function QuickAdd({ onAdd }) {
@@ -94,20 +95,27 @@ export default function QuickAdd({ onAdd }) {
           )}
         </div>
 
-        <div className="grid h-11 grid-cols-2 rounded-md border border-slate-300 bg-slate-100 p-1">
+        <div className="grid h-11 grid-cols-3 rounded-md border border-slate-300 bg-slate-100 p-1">
           <button
-            className={`min-w-11 rounded px-3 text-sm font-bold ${type === 'normal' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'}`}
+            className={`min-w-10 rounded px-2 text-sm font-bold ${type === 'normal' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'}`}
             onClick={() => switchType('normal')}
             type="button"
           >
             N
           </button>
           <button
-            className={`min-w-11 rounded px-3 text-sm font-bold ${type === 'troquelada' ? 'bg-white text-amber-800 shadow-sm' : 'text-slate-600'}`}
+            className={`min-w-10 rounded px-2 text-sm font-bold ${type === 'troquelada' ? 'bg-white text-amber-800 shadow-sm' : 'text-slate-600'}`}
             onClick={() => switchType('troquelada')}
             type="button"
           >
             T
+          </button>
+          <button
+            className={`min-w-10 rounded px-2 text-sm font-bold ${type === 'repechaje' ? 'bg-white text-blue-800 shadow-sm' : 'text-slate-600'}`}
+            onClick={() => switchType('repechaje')}
+            type="button"
+          >
+            E
           </button>
         </div>
 

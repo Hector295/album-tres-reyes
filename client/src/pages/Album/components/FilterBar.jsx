@@ -8,7 +8,8 @@ const statusOptions = [
 const typeOptions = [
   { label: 'Todas', value: '' },
   { label: 'Normales', value: 'normal' },
-  { label: 'Troqueladas', value: 'troquelada' }
+  { label: 'Troqueladas', value: 'troquelada' },
+  { label: 'Repechaje', value: 'repechaje' }
 ];
 
 export default function FilterBar({ search, setSearch, status, setStatus, type, setType }) {

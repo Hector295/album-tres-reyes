@@ -7,8 +7,9 @@ import StatsBar from './Album/components/StatsBar.jsx';
 import StickerList from './Album/components/StickerList.jsx';
 import Trades from './Album/components/Trades.jsx';
 import Profile from './Album/components/Profile.jsx';
+import ExportPDF from './Album/components/ExportPDF.jsx';
 
-const emptyStats = { total: 632, owned: 0, missing: 632, duplicates: 0 };
+const emptyStats = { total: 699, owned: 0, missing: 699, duplicates: 0 };
 
 export default function Album() {
   const { logout, user } = useAuth();
@@ -105,7 +106,7 @@ export default function Album() {
         </div>
 
         <div className="mx-auto flex max-w-6xl gap-1 px-4 pb-0">
-          {[{ label: 'Mi álbum', value: 'album' }, { label: 'Intercambios', value: 'trades' }, { label: 'Perfil', value: 'profile' }].map((tab) => (
+          {[{ label: 'Mi álbum', value: 'album' }, { label: 'Intercambios', value: 'trades' }, { label: 'Perfil', value: 'profile' }, { label: 'Exportar', value: 'export' }].map((tab) => (
             <button
               key={tab.value}
               className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
@@ -148,9 +149,13 @@ export default function Album() {
         <section className="mx-auto max-w-6xl px-4 py-4">
           <Trades />
         </section>
-      ) : (
+      ) : view === 'profile' ? (
         <section className="mx-auto max-w-6xl px-4 py-4">
           <Profile />
+        </section>
+      ) : (
+        <section className="mx-auto max-w-6xl px-4 py-4">
+          <ExportPDF username={user?.username} />
         </section>
       )}
     </main>

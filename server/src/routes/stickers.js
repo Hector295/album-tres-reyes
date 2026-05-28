@@ -2,8 +2,8 @@ const express = require('express');
 const db = require('../db/database');
 
 const router = express.Router();
-const TOTAL_STICKERS = 632;
-const validTypes = new Set(['normal', 'troquelada']);
+const TOTAL_STICKERS = 699;
+const validTypes = new Set(['normal', 'troquelada', 'repechaje']);
 const validStatuses = new Set(['owned', 'missing', 'duplicate']);
 
 function getStickerForUser(userId, stickerId) {
