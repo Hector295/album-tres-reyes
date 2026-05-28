@@ -37,3 +37,9 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.image }}
+
+      - name: Trigger Dokploy redeploy
+        if: env.WEBHOOK != ''
+        env:
+          WEBHOOK: ${{ secrets.WEBHOOK }}
+        run: curl -fsSL -X GET "$WEBHOOK"

@@ -5,11 +5,14 @@ import FilterBar from './Album/components/FilterBar.jsx';
 import QuickAdd from './Album/components/QuickAdd.jsx';
 import StatsBar from './Album/components/StatsBar.jsx';
 import StickerList from './Album/components/StickerList.jsx';
+import Trades from './Album/components/Trades.jsx';
+import Profile from './Album/components/Profile.jsx';
 
 const emptyStats = { total: 632, owned: 0, missing: 632, duplicates: 0 };
 
 export default function Album() {
   const { logout, user } = useAuth();
+  const [view, setView] = useState('album'); // 'album' | 'trades'
   const [stickers, setStickers] = useState([]);
   const [stats, setStats] = useState(emptyStats);
   const [status, setStatus] = useState('');
@@ -42,15 +45,13 @@ export default function Album() {
 
     loadStickers()
       .catch((err) => {
-        if (active) setError(err.response?.data?.message || 'No se pudo cargar el album');
+        if (active) setError(err.response?.data?.message || 'No se pudo cargar el álbum');
       })
       .finally(() => {
         if (active) setLoading(false);
       });
 
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [loadStickers]);
 
   useEffect(() => {
@@ -102,30 +103,56 @@ export default function Album() {
             Salir
           </button>
         </div>
+
+        <div className="mx-auto flex max-w-6xl gap-1 px-4 pb-0">
+          {[{ label: 'Mi álbum', value: 'album' }, { label: 'Intercambios', value: 'trades' }, { label: 'Perfil', value: 'profile' }].map((tab) => (
+            <button
+              key={tab.value}
+              className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
+                view === tab.value
+                  ? 'border-emerald-600 text-emerald-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+              onClick={() => setView(tab.value)}
+              type="button"
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      <QuickAdd onAdd={addByNumber} />
-
-      <section className="mx-auto max-w-6xl px-4 py-4">
-        <StatsBar stats={stats} />
-        <FilterBar
-          search={search}
-          setSearch={setSearch}
-          status={status}
-          setStatus={setStatus}
-          type={type}
-          setType={setType}
-        />
-
-        {error ? <p className="mt-4 rounded-md bg-red-50 p-3 text-sm font-medium text-red-700">{error}</p> : null}
-
-        <StickerList
-          loading={loading}
-          stickers={stickers}
-          onAdd={(id) => changeQuantity(id, 'add')}
-          onRemove={(id) => changeQuantity(id, 'remove')}
-        />
-      </section>
+      {view === 'album' ? (
+        <>
+          <QuickAdd onAdd={addByNumber} />
+          <section className="mx-auto max-w-6xl px-4 py-4">
+            <StatsBar stats={stats} />
+            <FilterBar
+              search={search}
+              setSearch={setSearch}
+              status={status}
+              setStatus={setStatus}
+              type={type}
+              setType={setType}
+            />
+            {error && <p className="mt-4 rounded-md bg-red-50 p-3 text-sm font-medium text-red-700">{error}</p>}
+            <StickerList
+              loading={loading}
+              stickers={stickers}
+              onAdd={(id) => changeQuantity(id, 'add')}
+              onRemove={(id) => changeQuantity(id, 'remove')}
+            />
+          </section>
+        </>
+      ) : view === 'trades' ? (
+        <section className="mx-auto max-w-6xl px-4 py-4">
+          <Trades />
+        </section>
+      ) : (
+        <section className="mx-auto max-w-6xl px-4 py-4">
+          <Profile />
+        </section>
+      )}
     </main>
   );
 }

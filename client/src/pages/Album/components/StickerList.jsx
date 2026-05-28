@@ -56,7 +56,7 @@ export default function StickerList({ loading, stickers, onAdd, onRemove }) {
   if (loading) {
     return (
       <section className="mt-4 rounded-lg border border-slate-200 bg-white p-6 text-center font-semibold text-slate-500">
-        Cargando album...
+        Cargando álbum...
       </section>
     );
   }

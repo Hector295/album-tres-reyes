@@ -15,7 +15,7 @@ export default function Login({ onNavigate }) {
     try {
       await login(username, password);
     } catch (err) {
-      setError(err.response?.data?.message || 'No se pudo iniciar sesion');
+      setError(err.response?.data?.message || 'No se pudo iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -28,7 +28,7 @@ export default function Login({ onNavigate }) {
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
             3 Reyes del Mundial 2026
           </p>
-          <h1 className="mt-2 text-2xl font-bold">Iniciar sesion</h1>
+          <h1 className="mt-2 text-2xl font-bold">Iniciar sesión</h1>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -74,7 +74,7 @@ export default function Login({ onNavigate }) {
             onClick={() => onNavigate('register')}
             type="button"
           >
-            Registrate
+            Regístrate
           </button>
         </p>
       </section>

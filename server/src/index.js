@@ -9,6 +9,8 @@ const seedStickers = require('./db/seed');
 const auth = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const stickerRoutes = require('./routes/stickers');
+const tradeRoutes = require('./routes/trades');
+const profileRoutes = require('./routes/profile');
 
 initializeSchema();
 seedStickers();
@@ -27,6 +29,8 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/stickers', auth, stickerRoutes);
+app.use('/api/trades', auth, tradeRoutes);
+app.use('/api/profile', auth, profileRoutes);
 
 app.use(express.static(clientDist));
 app.get('*', (_req, res, next) => {

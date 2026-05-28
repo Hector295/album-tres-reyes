@@ -31,6 +31,11 @@ function initializeSchema() {
     CREATE INDEX IF NOT EXISTS idx_stickers_type_number ON stickers(type, number);
     CREATE INDEX IF NOT EXISTS idx_user_stickers_user ON user_stickers(user_id);
   `);
+
+  // Migración: agrega columnas de contacto si no existen
+  const columns = db.pragma('table_info(users)').map((c) => c.name);
+  if (!columns.includes('phone')) db.exec('ALTER TABLE users ADD COLUMN phone TEXT');
+  if (!columns.includes('email')) db.exec('ALTER TABLE users ADD COLUMN email TEXT');
 }
 
 module.exports = initializeSchema;

@@ -17,7 +17,7 @@ export default function QuickAdd({ onAdd }) {
     const value = Number(number);
 
     if (!Number.isInteger(value) || value < 1) {
-      setFeedback('Numero invalido');
+      setFeedback('Número inválido');
       setIsError(true);
       inputRef.current?.focus();
       return;
@@ -47,14 +47,14 @@ export default function QuickAdd({ onAdd }) {
         onSubmit={handleSubmit}
       >
         <div className="min-w-0 flex-1 sm:max-w-44">
-          <label className="sr-only" htmlFor="quick-number">Numero</label>
+          <label className="sr-only" htmlFor="quick-number">Número</label>
           <input
             ref={inputRef}
             id="quick-number"
             className="h-11 w-full rounded-md border border-slate-300 px-3 text-lg font-semibold outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
             inputMode="numeric"
             min="1"
-            placeholder="Numero"
+            placeholder="Número"
             type="number"
             value={number}
             onChange={(e) => { setNumber(e.target.value); setIsError(false); }}

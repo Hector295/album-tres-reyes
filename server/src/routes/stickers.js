@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
   const params = { userId: req.user.id };
 
   if (type) {
-    if (!validTypes.has(type)) return res.status(400).json({ message: 'Tipo invalido' });
+    if (!validTypes.has(type)) return res.status(400).json({ message: 'Tipo inválido' });
     conditions.push('s.type = @type');
     params.type = type;
   }
@@ -39,7 +39,7 @@ router.get('/', (req, res) => {
   }
 
   if (status) {
-    if (!validStatuses.has(status)) return res.status(400).json({ message: 'Estado invalido' });
+    if (!validStatuses.has(status)) return res.status(400).json({ message: 'Estado inválido' });
     if (status === 'owned') conditions.push('COALESCE(us.quantity, 0) >= 1');
     if (status === 'missing') conditions.push('COALESCE(us.quantity, 0) = 0');
     if (status === 'duplicate') conditions.push('COALESCE(us.quantity, 0) > 1');

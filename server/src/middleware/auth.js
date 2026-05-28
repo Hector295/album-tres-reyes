@@ -12,7 +12,7 @@ function auth(req, res, next) {
     req.user = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-change-me');
     return next();
   } catch {
-    return res.status(401).json({ message: 'Token invalido' });
+    return res.status(401).json({ message: 'Token inválido' });
   }
 }
 

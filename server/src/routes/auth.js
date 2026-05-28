@@ -21,11 +21,11 @@ router.post('/register', (req, res) => {
   const password = String(req.body.password || '');
 
   if (!usernamePattern.test(username)) {
-    return res.status(400).json({ message: 'Usuario invalido' });
+    return res.status(400).json({ message: 'Nombre de usuario inválido' });
   }
 
   if (password.length < 6) {
-    return res.status(400).json({ message: 'La contrasena debe tener al menos 6 caracteres' });
+    return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
   }
 
   const passwordHash = bcrypt.hashSync(password, 12);
@@ -52,7 +52,7 @@ router.post('/login', (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
-    return res.status(401).json({ message: 'Credenciales invalidas' });
+    return res.status(401).json({ message: 'Credenciales inválidas' });
   }
 
   return res.json({ token: signToken(user), user: publicUser(user) });

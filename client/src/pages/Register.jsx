@@ -75,7 +75,7 @@ export default function Register({ onNavigate }) {
             onClick={() => onNavigate('login')}
             type="button"
           >
-            Entra aqui
+            Entra aquí
           </button>
         </p>
       </section>
