@@ -82,7 +82,7 @@ export default function Album() {
 
     if (!target) {
       const { data } = await api.get('/stickers', {
-        params: { type: selectedType, search: selectedType === 'normal' ? String(normalized).padStart(3, '0') : `T${String(normalized).padStart(2, '0')}` }
+        params: { type: selectedType, search: String(normalized) }
       });
       const exact = data.find((sticker) => sticker.number === normalized && sticker.type === selectedType);
       if (!exact) throw new Error('Figurita no encontrada');

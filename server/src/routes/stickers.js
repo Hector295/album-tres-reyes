@@ -5,6 +5,7 @@ const router = express.Router();
 const TOTAL_STICKERS = 699;
 const validTypes = new Set(['normal', 'troquelada', 'repechaje']);
 const validStatuses = new Set(['owned', 'missing', 'duplicate']);
+const codeSearchPattern = /^[TE]\d+$/i;
 
 function getStickerForUser(userId, stickerId) {
   return db
@@ -34,8 +35,20 @@ router.get('/', (req, res) => {
   }
 
   if (search) {
-    conditions.push("(s.display_code LIKE @search OR COALESCE(s.name, '') LIKE @search)");
-    params.search = `%${search}%`;
+    if (/^\d+$/.test(search)) {
+      conditions.push('s.number = @searchNumber');
+      params.searchNumber = Number(search);
+
+      if (!type) {
+        conditions.push("s.type = 'normal'");
+      }
+    } else if (codeSearchPattern.test(search)) {
+      conditions.push('s.display_code = @searchCode');
+      params.searchCode = search.toUpperCase();
+    } else {
+      conditions.push("COALESCE(s.name, '') LIKE @search");
+      params.search = `%${search}%`;
+    }
   }
 
   if (status) {
