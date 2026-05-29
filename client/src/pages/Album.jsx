@@ -153,7 +153,7 @@ export default function Album() {
         </>
       ) : view === 'trades' ? (
         <section className="mx-auto max-w-6xl px-4 py-4">
-          <Trades />
+          <Trades onCollectionChanged={refresh} />
         </section>
       ) : view === 'profile' ? (
         <section className="mx-auto max-w-6xl px-4 py-4">

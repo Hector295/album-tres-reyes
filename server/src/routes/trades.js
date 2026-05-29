@@ -2,6 +2,49 @@ const express = require('express');
 const db = require('../db/database');
 
 const router = express.Router();
+const validTypes = new Set(['normal', 'troquelada', 'repechaje']);
+
+function normalizeItems(items) {
+  if (!Array.isArray(items)) return [];
+
+  const grouped = new Map();
+
+  for (const item of items) {
+    const number = Number(item?.number);
+    const type = String(item?.type || '').trim();
+    const quantity = Number(item?.quantity || 1);
+
+    if (
+      !Number.isInteger(number) ||
+      number < 1 ||
+      !validTypes.has(type) ||
+      !Number.isInteger(quantity) ||
+      quantity < 1
+    ) {
+      return null;
+    }
+
+    const key = `${type}:${number}`;
+    const current = grouped.get(key) || { number, type, quantity: 0 };
+    current.quantity += quantity;
+    grouped.set(key, current);
+  }
+
+  return [...grouped.values()];
+}
+
+function getStickerByNumber(number, type) {
+  return db
+    .prepare('SELECT id, number, type, display_code AS displayCode FROM stickers WHERE number = ? AND type = ?')
+    .get(number, type);
+}
+
+function getUserQuantity(userId, stickerId) {
+  const row = db
+    .prepare('SELECT quantity FROM user_stickers WHERE user_id = ? AND sticker_id = ?')
+    .get(userId, stickerId);
+  return row?.quantity || 0;
+}
 
 // GET /api/trades — resumen de intercambios posibles con cada usuario
 router.get('/', (req, res) => {
@@ -28,6 +71,69 @@ router.get('/', (req, res) => {
   `).all(myId, myId);
 
   res.json(rows);
+});
+
+// POST /api/trades/settle — aplica una operación libre: regalo, intercambio 1:1 o varios por uno.
+router.post('/settle', (req, res) => {
+  const myId = req.user.id;
+  const give = normalizeItems(req.body.give);
+  const receive = normalizeItems(req.body.receive);
+
+  if (!give || !receive) {
+    return res.status(400).json({ message: 'Figuritas inválidas' });
+  }
+
+  if (!give.length && !receive.length) {
+    return res.status(400).json({ message: 'Agrega al menos una figurita' });
+  }
+
+  const resolvedGive = [];
+  const resolvedReceive = [];
+
+  for (const item of give) {
+    const sticker = getStickerByNumber(item.number, item.type);
+    if (!sticker) return res.status(404).json({ message: `No existe ${item.type} ${item.number}` });
+
+    const currentQuantity = getUserQuantity(myId, sticker.id);
+    if (currentQuantity < item.quantity) {
+      return res.status(400).json({
+        message: `No tienes suficientes ${sticker.displayCode}. Tienes ${currentQuantity} y quieres entregar ${item.quantity}.`
+      });
+    }
+
+    resolvedGive.push({ ...item, sticker });
+  }
+
+  for (const item of receive) {
+    const sticker = getStickerByNumber(item.number, item.type);
+    if (!sticker) return res.status(404).json({ message: `No existe ${item.type} ${item.number}` });
+    resolvedReceive.push({ ...item, sticker });
+  }
+
+  db.transaction(() => {
+    for (const item of resolvedGive) {
+      db.prepare(`
+        INSERT INTO user_stickers (user_id, sticker_id, quantity)
+        VALUES (?, ?, 0)
+        ON CONFLICT(user_id, sticker_id)
+        DO UPDATE SET quantity = MAX(quantity - ?, 0)
+      `).run(myId, item.sticker.id, item.quantity);
+    }
+
+    for (const item of resolvedReceive) {
+      db.prepare(`
+        INSERT INTO user_stickers (user_id, sticker_id, quantity)
+        VALUES (?, ?, ?)
+        ON CONFLICT(user_id, sticker_id)
+        DO UPDATE SET quantity = quantity + ?
+      `).run(myId, item.sticker.id, item.quantity, item.quantity);
+    }
+  })();
+
+  res.json({
+    give: resolvedGive.map((item) => ({ ...item.sticker, quantity: item.quantity })),
+    receive: resolvedReceive.map((item) => ({ ...item.sticker, quantity: item.quantity }))
+  });
 });
 
 // GET /api/trades/:userId — detalle de figuritas intercambiables con un usuario
